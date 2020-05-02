@@ -59,7 +59,11 @@ Update your teams app manifest:
 
 Build project. Launch ngrok, or otherwise host your web server. Upload your favorite version of the app to teams (manifest .zip files will be located in Microsoft.Teams.Samples.HelloWorld.Web\bin.
 
+### Tab SSO
 
+See https://docs.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/authentication/auth-aad-sso#steps
+
+If you want to see the tab SSO consent popup, the app must be registered in a different tenant. Otherwise AAD will return an access token without the user needing to consent to `openid`, `email`, and `profile` scopes.
 
 ## Demo script
 
