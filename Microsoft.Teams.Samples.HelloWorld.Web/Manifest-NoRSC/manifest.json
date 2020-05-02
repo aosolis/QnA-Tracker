@@ -1,9 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
   "manifestVersion": "devPreview",
-
   "version": "1.0.6",
-  "id": "42eaaa11-7350-429f-a6ed-ddba0a0b77cc",
+  "id": "07dfc869-9476-4893-9f8b-4d7e4ad0e166",
   "packageName": "com.contoso.helloworld-norsc",
   "developer": {
     "name": "Contoso",
@@ -26,7 +25,7 @@
   "accentColor": "#60A18E",
   "configurableTabs": [
     {
-      "configurationUrl": "https://qna.ngrok.io/configure?useRSC=false",
+      "configurationUrl": "https://e7e4e4f4.ngrok.io/configure?useRSC=false",
       "canUpdateConfiguration": false,
       "scopes": [
         "team"
@@ -37,7 +36,7 @@
     {
       "entityId": "com.contoso.helloworld.hellotab",
       "name": "Hello Tab",
-      "contentUrl": "https://qna.ngrok.io/hello",
+      "contentUrl": "https://e7e4e4f4.ngrok.io/hello",
       "scopes": [
         "personal"
       ]
@@ -45,7 +44,7 @@
   ],
   "bots": [
     {
-      "botId": "cb38cf54-ac89-4a7a-9ea3-095d3d080037",
+      "botId": "07dfc869-9476-4893-9f8b-4d7e4ad0e166",
       "scopes": [
         "team",
         "groupchat",
@@ -119,6 +118,10 @@
     "messageTeamMembers"
   ],
   "validDomains": [
-    "808e656d.ngrok.io"
-  ]
+    "e7e4e4f4.ngrok.io"
+  ],
+  "webApplicationInfo": {
+    "id": "07dfc869-9476-4893-9f8b-4d7e4ad0e166",
+    "resource": "api://e7e4e4f4.ngrok.io/07dfc869-9476-4893-9f8b-4d7e4ad0e166"
+  }
 }

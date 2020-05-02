@@ -160,6 +160,35 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             throw new Exception("Unauthorized user!");
         }
 
+        /// <summary>
+        /// Login to the application using an access token.
+        /// </summary>
+        /// <remarks>
+        ///     This method exchanges the access token for a Graph token, and sets the same cookies that are set by the explicit login flow.
+        ///     If the exchange fails, the method throws an <see cref="Exception"/>, with the AAD response in the exception message.
+        /// </remarks>
+        /// <param name="useRSC">true if RSC is in use, false otherwise</param>
+        /// <param name="tabSsoToken">Tab SSO token, which is a user-delegated access token for this app</param>
+        /// <param name="responseCookies">Response cookie collection</param>
+        /// <returns>Tracking task</returns>
+        public static async Task TokenLoginAsync(bool useRSC, string tabSsoToken, HttpCookieCollection responseCookies)
+        {
+            string appId = GetGraphAppId(useRSC);
+            string appSecret = Uri.EscapeDataString(GetGraphAppPassword(useRSC));
+            string tenant = GetTenant(tabSsoToken);
+
+            // See https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
+            string response = await HttpHelpers.POST($"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
+                    $"&client_id={appId}&client_secret={appSecret}" +
+                    "&grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer" +
+                    $"&assertion={tabSsoToken}" +
+                    "&requested_token_use=on_behalf_of" +
+                    "&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default");
+            string token = response.Deserialize<TokenResponse>().access_token;
+
+            responseCookies.Add(new System.Web.HttpCookie("GraphToken", token));
+        }
+
         public static void Logout(HttpCookieCollection responseCookies)
         {
             if (responseCookies["GraphToken"] != null)
@@ -170,7 +199,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             }
         }
 
-    private static string GetTokenClaim(string token, string claimType)
+        private static string GetTokenClaim(string token, string claimType)
         {
             if (token == "access_denied")
                 return null;
@@ -412,6 +441,28 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             //return ShowSignin(usingRSC);
             string url = $"~/First?tenantId={tenantId}&teamId={teamId}&channelId={channelId}&useRSC={useRSC}";
             return Redirect(url);
+        }
+
+        // Token-based login
+        [Route("tokenLogin")]
+        [HttpPost]
+        public async Task<ActionResult> TokenLogin([FromUri] bool? useRSC)
+        {
+            try
+            {
+                await Authorization.TokenLoginAsync(useRSC ?? false, Request.Form["token"], Response.Cookies);
+                return new HttpStatusCodeResult(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                Authorization.Logout(Response.Cookies);
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return new ContentResult
+                {
+                    ContentType = "application/json",
+                    Content = ex.Message
+                };
+            }
         }
 
         [Route("")]
